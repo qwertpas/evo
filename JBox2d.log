@@ -1,0 +1,1 @@
+2021-05-06 22:02:44,628 [Testbed] DEBUG org.jbox2d.testbed.framework.j2d.TestPanelJ2D.render(TestPanelJ2D.java:173) - dbImage is null, creating a new one
