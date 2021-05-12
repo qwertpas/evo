@@ -1,14 +1,17 @@
 package org.chis;
 
+import java.awt.Toolkit;
+
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
-import org.jbox2d.common.MathUtils;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
 
 import processing.core.PApplet;
@@ -21,15 +24,17 @@ public class MySketch extends PApplet {
     Body chassisBody;
     Body wheelLBody;
     Body wheelRBody;
+    Body armBody;
 
+    RevoluteJoint armJoint;
 
     public void init() {
 
-        { //WORLD
+        { // WORLD
             world = new World(new Vec2(0, -10f));
         }
 
-        { //GROUND
+        { // GROUND
             BodyDef groundBodyDef = new BodyDef();
             groundBody = world.createBody(groundBodyDef);
 
@@ -38,62 +43,78 @@ public class MySketch extends PApplet {
             groundBody.createFixture(groundShape, 0.0f);
         }
 
-        { //ROBOT
-            
-            { //chassis
-                BodyDef chassisBodyDef = new BodyDef();
-                chassisBodyDef.type = BodyType.DYNAMIC;
-                chassisBodyDef.position.set(0.0f, 2.0f);
+        // Car
+        {
+            PolygonShape chassis = new PolygonShape();
+            chassis.setAsBox(0.38f, 0.025f);
 
-                PolygonShape chassisShape = new PolygonShape();
-                chassisShape.setAsBox(2.0f, 0.1f);
-                
-                chassisBody = world.createBody(chassisBodyDef);
-                chassisBody.createFixture(chassisShape, 2.0f);
-            }
-            
-            { //wheelL
-                BodyDef wheelLBodyDef = new BodyDef();
-                wheelLBodyDef.type = BodyType.DYNAMIC;
-                wheelLBodyDef.position.set(-1.0f, 0.0f);
+            CircleShape circle = new CircleShape();
+            circle.m_radius = 0.076f;
 
-                CircleShape wheelLShape = new CircleShape();
-                wheelLShape.setRadius(0.5f);
+            BodyDef bd = new BodyDef();
+            bd.type = BodyType.DYNAMIC;
+            bd.fixedRotation = false;
+            bd.position.set(0.0f, 1.0f);
+            chassisBody = world.createBody(bd);
+            chassisBody.createFixture(chassis, 10.0f);
 
-                wheelLBody = world.createBody(wheelLBodyDef);
-                wheelLBody.createFixture(wheelLShape, 2.0f);
+            FixtureDef fd = new FixtureDef();
+            fd.shape = circle;
+            fd.density = 1.0f;
+            fd.friction = 0.9f;
 
-                RevoluteJointDef wheelLJoint = new RevoluteJointDef();
-                wheelLJoint.initialize(wheelLBody, chassisBody, new Vec2(-1.0f, 0.0f));
-                wheelLJoint.motorSpeed = 1.0f * MathUtils.PI;
-                wheelLJoint.maxMotorTorque = 10000.0f;
-                wheelLJoint.enableMotor = true;
-            }
+            bd.position.set(-0.35f, 1.0f);
+            wheelLBody = world.createBody(bd);
+            wheelLBody.createFixture(fd);
 
-            { //wheelR
-                BodyDef wheelRBodyDef = new BodyDef();
-                wheelRBodyDef.type = BodyType.DYNAMIC;
-                wheelRBodyDef.position.set(1.0f, 0.0f);
+            bd.position.set(0.35f, 1.0f);
+            wheelRBody = world.createBody(bd);
+            wheelRBody.createFixture(fd);
 
-                CircleShape wheelRShape = new CircleShape();
-                wheelRShape.setRadius(0.5f);
+            PolygonShape armShape = new PolygonShape();
+            armShape.setAsBox(0.025f, 0.38f);
 
-                wheelRBody = world.createBody(wheelRBodyDef);
-                wheelRBody.createFixture(wheelRShape, 2.0f);
+            fd.shape = armShape;
+            bd.position.set(0, 1.5f);
+            armBody = world.createBody(bd);
+            armBody.createFixture(fd);
 
-                RevoluteJointDef wheelRJoint = new RevoluteJointDef();
-                wheelRJoint.initialize(wheelRBody, chassisBody, new Vec2(1.0f, 0.0f));
-                wheelRJoint.motorSpeed = 1.0f * MathUtils.PI;
-                wheelRJoint.maxMotorTorque = 10000.0f;
-                wheelRJoint.enableMotor = true;
-            }
+            bd.position.set(0, 2.4f);
+            Body armBody2 = world.createBody(bd);
+            armBody2.createFixture(fd);
+
+            RevoluteJointDef jd = new RevoluteJointDef();
+
+            jd.initialize(chassisBody, wheelLBody, wheelLBody.getPosition());
+            jd.motorSpeed = 10.0f;
+            jd.maxMotorTorque = 20.0f;
+            jd.enableMotor = false;
+            world.createJoint(jd);
+
+            jd.initialize(chassisBody, wheelRBody, wheelRBody.getPosition());
+            jd.motorSpeed = 0.0f;
+            jd.maxMotorTorque = 10.0f;
+            jd.enableMotor = false;
+            world.createJoint(jd);
+
+            jd.initialize(armBody, chassisBody, new Vec2(0, 1f));
+            jd.motorSpeed = 0.0f;
+            jd.maxMotorTorque = 10.0f;
+            jd.enableMotor = true;
+            armJoint = (RevoluteJoint) (world.createJoint(jd));
+
+            jd.initialize(armBody, armBody2, new Vec2(0, 2f));
+            jd.motorSpeed = 0.0f;
+            jd.maxMotorTorque = 10.0f;
+            jd.enableMotor = false;
+            world.createJoint(jd);
         }
     }
 
     @Override
     public void settings() {
         init();
-        size(500, 500);
+        size(Toolkit.getDefaultToolkit().getScreenSize().width, 500);
     }
 
     @Override
@@ -101,14 +122,39 @@ public class MySketch extends PApplet {
         clear();
 
         PDraw.drawWorld(world, this);
-        world.step(1/60.0f, 1, 1);
+        world.step(1 / 60.0f, 1, 2);
+
     }
 
+    @Override
+    public void keyPressed(){
+        if(key == 'a'){
+            armJoint.setMotorSpeed(-5);
+        }
+        if(key == 'd'){
+            armJoint.setMotorSpeed(5);
+        }
+    }
+
+    @Override
+    public void keyReleased(){
+        armJoint.setMotorSpeed(0);
+    }
+
+    public static void main(String[] args) {
+        String[] processingArgs = { "MySketch" };
+        MySketch mySketch = new MySketch();
+
+        PApplet.runSketch(processingArgs, mySketch);
 
 
-    public static void main(String[] args){
-		String[] processingArgs = {"MySketch"};
-		MySketch mySketch = new MySketch();
-		PApplet.runSketch(processingArgs, mySketch);
-	}
+        
+        // mySketch.init();
+        // long lasttime = System.nanoTime();
+        // while(true){
+        //     mySketch.world.step(1 / 60.0f, 1, 2);
+        //     System.out.println((System.nanoTime() - lasttime) * 1e-9);
+        //     lasttime = System.nanoTime();
+        // }
+    }
 }

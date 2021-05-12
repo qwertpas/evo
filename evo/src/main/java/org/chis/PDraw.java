@@ -12,8 +12,8 @@ import processing.core.PApplet;
 
 public class PDraw {
 
-    public static float scale = 50;
-    public static Vec2 offset = new Vec2(100f, -500f);
+    public static float scale = 150;
+    public static Vec2 offset = new Vec2(5, 5);
     // public static color color;
 
     public static void drawWorld(World world, PApplet pApplet){
@@ -22,7 +22,7 @@ public class PDraw {
         offset.y = -pApplet.height + 50;
 
         Body body = world.getBodyList();
-        System.out.println("Draw World");
+        // System.out.println("Draw World");
 
         while(true){
 
@@ -30,9 +30,10 @@ public class PDraw {
                 return;
             }
 
-            pApplet.stroke(255, 0, 0);
+            pApplet.noFill();
 
-            pApplet.fill(0, 255, 0);
+            pApplet.stroke(255, 255, 255);
+            pApplet.strokeWeight(0.01f);
 
             
             
@@ -44,50 +45,67 @@ public class PDraw {
 
     public static void drawShape(Body body, PApplet pApplet) {
         Fixture fixture = body.getFixtureList();
+
+        pApplet.pushMatrix();
+        pApplet.translate(scale * body.getPosition().x, scale * -body.getPosition().y);
+
+        pApplet.translate(offset.x, -offset.y);
+
+        pApplet.rotate(-body.getAngle());
+
+        pApplet.scale(scale);
         
         switch (fixture.getType()) {
+
             case CIRCLE:
-                System.out.println("Drawing Circle: " + body.getPosition().toString());
+                // System.out.println("Drawing Circle: " + body.getPosition().toString());
 
                 CircleShape circle = (CircleShape) fixture.getShape();
 
-                Vec2 center = body.getPosition().mul(scale).add(offset);
+                Vec2 center = body.getPosition();
                 // Transform.mulToOutUnsafe(xf, circle.m_p, center);
-                float radius = circle.m_radius * scale;
-                
-                pApplet.ellipse(center.x, -center.y, radius, radius);
+                float radius = circle.m_radius;
+                pApplet.ellipse(0, 0, radius*2 , radius*2);
+
+                // float sin = (float) Math.sin(body.getAngle());
+                // float cos = (float) Math.cos(body.getAngle());
+                pApplet.line(0, 0, radius, 0);
 
 
                 break;
 
             case POLYGON: 
-                System.out.println("Drawing Polygon: " + body.getPosition().toString());
+                // System.out.println("Drawing Polygon: " + body.getPosition().toString());
 
                 PolygonShape poly = (PolygonShape) fixture.getShape();
                 int vertexCount = poly.m_count;
 
                 pApplet.beginShape();
 
-                for (int i = 0; i < vertexCount; ++i) {
-                    Vec2 vToDraw = poly.m_vertices[i].add(body.getPosition()).mul(scale).add(offset);
-                    pApplet.vertex(vToDraw.x, -vToDraw.y);
+                for (int i = 0; i < vertexCount; i++) {
+                    Vec2 vToDraw = poly.m_vertices[i];
+                    pApplet.vertex(vToDraw.x, vToDraw.y);
                 }
 
-                pApplet.endShape();
+                pApplet.endShape(pApplet.CLOSE);
                 break;
 
             case EDGE: 
-                System.out.println("Drawing Edge: " + body.getPosition().toString());
+                // System.out.println("Drawing Edge: " + body.getPosition().toString());
 
                 EdgeShape edge = (EdgeShape) fixture.getShape();
-                Vec2 startpoint = edge.m_vertex1.add(body.getPosition()).mul(scale).add(offset);
-                Vec2 endpoint = edge.m_vertex2.add(body.getPosition()).mul(scale).add(offset);
+                Vec2 startpoint = edge.m_vertex1;
+                Vec2 endpoint = edge.m_vertex2;
                 
-                pApplet.line(startpoint.x, -startpoint.y, endpoint.x, -endpoint.y);
+                pApplet.line(startpoint.x, startpoint.y, endpoint.x, endpoint.y);
                 break;
 
             default:
                 break;
+
         }
+        
+        pApplet.popMatrix();
+
     }
 }
