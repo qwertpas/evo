@@ -2,7 +2,7 @@ package org.chis;
 
 public class NeurJoint {
 
-    public enum Type{
+    public enum NeurType{
         SENSOR, INNER, OUTPUT
     }
 
@@ -14,7 +14,7 @@ public class NeurJoint {
     Neur outputNeur;
     MechJoint outputMechJ;
 
-    Type type;
+    NeurType type;
 
 
     // public NeurJoint(float inputNum, Neur outputNeur, float weight){
@@ -26,7 +26,7 @@ public class NeurJoint {
     // }
 
     public NeurJoint(MechJoint inputMechJ, Neur outputNeur, float weight, float bias){
-        type = Type.SENSOR;
+        type = NeurType.SENSOR;
 
         this.inputMechJ = inputMechJ;
         this.outputNeur = outputNeur;
@@ -35,7 +35,7 @@ public class NeurJoint {
     }
 
     public NeurJoint(Neur inputNeur, Neur outputNeur, float weight, float bias){
-        type = Type.INNER;
+        type = NeurType.INNER;
         
         this.inputNeur = inputNeur;
         this.outputNeur = outputNeur;
@@ -44,7 +44,7 @@ public class NeurJoint {
     }
 
     public NeurJoint(Neur inputNeur, MechJoint outputMechJ, float weight, float bias){
-        type = Type.OUTPUT;
+        type = NeurType.OUTPUT;
         
         this.inputNeur = inputNeur;
         this.outputMechJ = outputMechJ;

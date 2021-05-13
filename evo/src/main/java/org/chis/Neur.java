@@ -2,13 +2,10 @@ package org.chis;
 
 public class Neur {
 
-    public enum Type{
-        INPUT, INNER, OUTPUT
-    }
-
     public float energy = 0.0f;
 
-    public boolean active = false;
+    public int id;
+
 
 
     public Neur(){

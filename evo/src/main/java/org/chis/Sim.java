@@ -58,7 +58,7 @@ public class Sim extends PApplet{
         }
 
         if(robots.size() > 0){
-            Robot lastRobot = robots.get(robots.size() - 1);
+            Robot lastRobot = robots.get(robots.size()-1);
             robots.add(lastRobot.mutate(world));
         }else{
             robots.add(new Robot(world));
@@ -83,10 +83,6 @@ public class Sim extends PApplet{
                 attached = false;
             }
         }
-
-        
-
-
 
         if(!attached && System.currentTimeMillis() - lastAttachTime > 1000){
             for (ContactEdge ce = box.getContactList(); ce != null; ce = ce.next){

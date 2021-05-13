@@ -28,6 +28,8 @@ public class MechJoint {
 
     public boolean grab;
 
+    public int id;
+
     public MechJoint(Mech mechA, Mech mechB, Vec2 anchor, World world){
 
         type = Type.REV;
@@ -41,7 +43,7 @@ public class MechJoint {
 
         revJointDef.initialize(mechA.body, mechB.body, anchor);
         revJointDef.motorSpeed = 0.0f;
-        revJointDef.maxMotorTorque = 2000.0f;
+        revJointDef.maxMotorTorque = 5.0f;
         revJointDef.enableMotor = true;
 
         revJoint = ((RevoluteJoint) world.createJoint(revJointDef));

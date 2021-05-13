@@ -95,7 +95,7 @@ public class PDraw {
                     pApplet.vertex(vToDraw.x, vToDraw.y);
                 }
 
-                pApplet.endShape(pApplet.CLOSE);
+                pApplet.endShape(PApplet.CLOSE);
                 break;
 
             case EDGE: 

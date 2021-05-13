@@ -5,6 +5,7 @@ import java.util.Random;
 
 import org.chis.Mech.Shape;
 import org.chis.MechJoint.Type;
+import org.chis.NeurJoint.NeurType;
 import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
@@ -19,6 +20,7 @@ public class Robot {
     public ArrayList<Float> data = new ArrayList<Float>();
 
     public int maxMechID = -1;
+    public int maxMechJointID = -1;
 
     Random random = new Random();
 
@@ -36,7 +38,9 @@ public class Robot {
         addMechJointRelease(); //3
 
         for(int i = 0; i < 10; i++){
-            neurs.add(new Neur());
+            Neur neur = new Neur();
+            neur.id = i;
+            neurs.add(neur);
         }
 
         //get arm angle and put into neur 2
@@ -104,21 +108,25 @@ public class Robot {
     
 
     public void addMechJointRev(int idA, int idB, Vec2 anchor, World world){
-
-        mechJoints.add(new MechJoint(mechs.get(idA), mechs.get(idB), anchor, world));
+        maxMechJointID += 1;
+        MechJoint mechJoint = new MechJoint(mechs.get(idA), mechs.get(idB), anchor, world);
+        mechJoint.id = maxMechJointID;
+        mechJoints.add(mechJoint);
 
     }
 
     public void addMechJointWeld(int idA, int idB, World world){
-
-        mechJoints.add(new MechJoint(mechs.get(idA), mechs.get(idB), world));
-
+        maxMechJointID += 1;
+        MechJoint mechJoint = new MechJoint(mechs.get(idA), mechs.get(idB), world);
+        mechJoint.id = maxMechJointID;
+        mechJoints.add(mechJoint);
     }
 
     public void addMechJointRelease(){
-
-        mechJoints.add(new MechJoint());
-
+        maxMechJointID += 1;
+        MechJoint mechJoint = new MechJoint();
+        mechJoint.id = maxMechJointID;
+        mechJoints.add(mechJoint);
     }
 
 
@@ -132,6 +140,7 @@ public class Robot {
 
     public void setNeurOutput(int neurID, int mechJID, float weight, float bias){
         neurJoints.add(new NeurJoint(neurs.get(neurID), mechJoints.get(mechJID), weight, bias));
+        // System.out.println("newNeurOutput: " + neurID + " to " + mechJID);
     }
 
     public void update(float boxX, boolean attached){
@@ -161,9 +170,9 @@ public class Robot {
         for(Mech oldMech : this.mechs){
             if(oldMech.shape == Shape.CIRCLE){
                 newRobot.addCircleMech(
-                    oldMech.radius + rng(0.01), 
-                    oldMech.density + rng(1), 
-                    oldMech.center.add(new Vec2(rng(0.1), rng(0.1))), 
+                    oldMech.radius + rng(0.0), 
+                    oldMech.density + rng(0), 
+                    oldMech.center.add(new Vec2(rng(0.0), rng(0.0))), 
                     newWorld
                 );
             }
@@ -179,6 +188,26 @@ public class Robot {
             if(oldJoint.type == Type.WELD){
                 newRobot.addMechJointWeld(oldJoint.mechA.id, oldJoint.mechB.id, newWorld);
             }
+            if(oldJoint.type == Type.RELEASE){
+                newRobot.addMechJointRelease();
+            }
+        }
+
+        for(int i = 0; i<this.neurs.size(); i++){
+            newRobot.neurs.add(new Neur());
+        }
+
+        for(NeurJoint oldJoint : this.neurJoints){
+            if(oldJoint.type == NeurType.SENSOR){
+                newRobot.setNeurSensor(oldJoint.inputMechJ.id, oldJoint.outputNeur.id, oldJoint.weight, oldJoint.bias);
+            }
+            if(oldJoint.type == NeurType.INNER){
+                newRobot.setNeurInner(oldJoint.inputNeur.id, oldJoint.outputNeur.id, oldJoint.weight, oldJoint.bias);
+            }
+            if(oldJoint.type == NeurType.OUTPUT){
+                newRobot.setNeurOutput(oldJoint.inputNeur.id, oldJoint.outputMechJ.id, oldJoint.weight, oldJoint.bias);
+            }
+            
         }
 
 
