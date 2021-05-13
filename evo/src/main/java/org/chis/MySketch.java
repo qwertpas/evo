@@ -11,8 +11,11 @@ import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
 import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
+import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.RevoluteJoint;
 import org.jbox2d.dynamics.joints.RevoluteJointDef;
+import org.jbox2d.dynamics.joints.WeldJoint;
+import org.jbox2d.dynamics.joints.WeldJointDef;
 
 import processing.core.PApplet;
 
@@ -25,8 +28,14 @@ public class MySketch extends PApplet {
     Body wheelLBody;
     Body wheelRBody;
     Body armBody;
+    Body armBody2;
+
+    Body boxBody;
 
     RevoluteJoint armJoint;
+    RevoluteJoint wheelJointL;
+    RevoluteJoint wheelJointR;
+
 
     public void init() {
 
@@ -43,6 +52,21 @@ public class MySketch extends PApplet {
             groundBody.createFixture(groundShape, 0.0f);
         }
 
+        { // BOX
+
+            PolygonShape boxShape = new PolygonShape();
+            boxShape.setAsBox(0.2f, 0.2f);
+
+            BodyDef bd = new BodyDef();
+            bd.type = BodyType.DYNAMIC;
+            bd.fixedRotation = false;
+            bd.position.set(2, 2);
+            boxBody = world.createBody(bd);
+            boxBody.createFixture(boxShape, 0.001f);
+
+            
+        }
+
         // Car
         {
             PolygonShape chassis = new PolygonShape();
@@ -56,7 +80,7 @@ public class MySketch extends PApplet {
             bd.fixedRotation = false;
             bd.position.set(0.0f, 1.0f);
             chassisBody = world.createBody(bd);
-            chassisBody.createFixture(chassis, 10.0f);
+            chassisBody.createFixture(chassis, 100.0f);
 
             FixtureDef fd = new FixtureDef();
             fd.shape = circle;
@@ -80,22 +104,22 @@ public class MySketch extends PApplet {
             armBody.createFixture(fd);
 
             bd.position.set(0, 2.4f);
-            Body armBody2 = world.createBody(bd);
+            armBody2 = world.createBody(bd);
             armBody2.createFixture(fd);
 
             RevoluteJointDef jd = new RevoluteJointDef();
 
             jd.initialize(chassisBody, wheelLBody, wheelLBody.getPosition());
-            jd.motorSpeed = 10.0f;
+            jd.motorSpeed = 0.0f;
             jd.maxMotorTorque = 20.0f;
-            jd.enableMotor = false;
-            world.createJoint(jd);
+            jd.enableMotor = true;
+            wheelJointL = (RevoluteJoint) world.createJoint(jd);
 
             jd.initialize(chassisBody, wheelRBody, wheelRBody.getPosition());
             jd.motorSpeed = 0.0f;
-            jd.maxMotorTorque = 10.0f;
-            jd.enableMotor = false;
-            world.createJoint(jd);
+            jd.maxMotorTorque = 20.0f;
+            jd.enableMotor = true;
+            wheelJointR = (RevoluteJoint) world.createJoint(jd);
 
             jd.initialize(armBody, chassisBody, new Vec2(0, 1f));
             jd.motorSpeed = 0.0f;
@@ -117,9 +141,34 @@ public class MySketch extends PApplet {
         size(Toolkit.getDefaultToolkit().getScreenSize().width, 500);
     }
 
+    boolean attached = false;
+    long lastAttachTime = 0;
+    WeldJoint weldJoint;
+
     @Override
     public void draw() {
         clear();
+
+
+
+        if(!attached && System.currentTimeMillis() - lastAttachTime > 1000){
+            for (ContactEdge ce = boxBody.getContactList(); ce != null; ce = ce.next){
+                if (ce.other == armBody2 && ce.contact.isTouching()){
+                    System.out.println("grab");
+    
+                    WeldJointDef jd = new WeldJointDef();
+    
+                    jd.initialize(ce.other, boxBody, boxBody.getPosition());
+                    weldJoint = (WeldJoint) world.createJoint(jd);
+    
+                    attached = true;
+                    lastAttachTime = System.currentTimeMillis();
+                    
+                    break;
+                }
+            }
+        }
+        
 
         PDraw.drawWorld(world, this);
         world.step(1 / 60.0f, 1, 2);
@@ -134,11 +183,27 @@ public class MySketch extends PApplet {
         if(key == 'd'){
             armJoint.setMotorSpeed(5);
         }
+
+        if(key == 'q'){
+            wheelJointL.setMotorSpeed(-5);
+            wheelJointR.setMotorSpeed(-5);
+        }
+        if(key == 'e'){
+            wheelJointL.setMotorSpeed(5);
+            wheelJointR.setMotorSpeed(5);
+        }
+
+        if(key == 't'){
+            world.destroyJoint(weldJoint);
+            attached = false;
+        }
     }
 
     @Override
     public void keyReleased(){
         armJoint.setMotorSpeed(0);
+        wheelJointL.setMotorSpeed(0);
+        wheelJointR.setMotorSpeed(0);
     }
 
     public static void main(String[] args) {

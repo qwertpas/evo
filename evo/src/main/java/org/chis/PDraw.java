@@ -30,10 +30,9 @@ public class PDraw {
                 return;
             }
 
-            pApplet.noFill();
+            pApplet.stroke(255);
 
-            pApplet.stroke(255, 255, 255);
-            pApplet.strokeWeight(0.01f);
+            pApplet.strokeWeight(0.001f);
 
             
             
@@ -44,7 +43,16 @@ public class PDraw {
     }
 
     public static void drawShape(Body body, PApplet pApplet) {
+
+        
+
+
         Fixture fixture = body.getFixtureList();
+
+        int red = colorSig(fixture.getDensity());
+
+        pApplet.fill(red, 255 - red, 255/2);
+
 
         pApplet.pushMatrix();
         pApplet.translate(scale * body.getPosition().x, scale * -body.getPosition().y);
@@ -107,5 +115,9 @@ public class PDraw {
         
         pApplet.popMatrix();
 
+    }
+
+    static int colorSig(double density){
+        return (int) (255 / (1+Math.exp(-(density-5)/2.0)));
     }
 }

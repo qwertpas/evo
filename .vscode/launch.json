@@ -6,6 +6,20 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Sim",
+            "request": "launch",
+            "mainClass": "org.chis.Sim",
+            "projectName": "evo"
+        },
+        {
+            "type": "java",
+            "name": "Launch Robot",
+            "request": "launch",
+            "mainClass": "org.chis.Robot",
+            "projectName": "evo"
+        },
+        {
+            "type": "java",
             "name": "Launch Current File",
             "request": "launch",
             "mainClass": "${file}"
