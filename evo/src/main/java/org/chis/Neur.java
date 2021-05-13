@@ -1,13 +1,19 @@
 package org.chis;
 
-import java.util.ArrayList;
-
 public class Neur {
+
+    public enum Type{
+        INPUT, INNER, OUTPUT
+    }
+
     public float energy = 0.0f;
 
     public boolean active = false;
 
-    public ArrayList<Neur> outputs = new ArrayList<Neur>();
+
+    public Neur(){
+
+    }
 
     
 
@@ -15,8 +21,8 @@ public class Neur {
         energy += input;
     }
 
-    public void update(){
-        
+    public float get(){
+        return (float) (1 / (1 + Math.exp(-energy)));
     }
 
 

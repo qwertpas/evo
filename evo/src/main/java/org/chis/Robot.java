@@ -12,9 +12,11 @@ import org.jbox2d.dynamics.World;
 public class Robot {
     public ArrayList<Mech> mechs = new ArrayList<Mech>();
     public ArrayList<MechJoint> mechJoints = new ArrayList<MechJoint>();
-    public ArrayList<Neur> neurs = new ArrayList<Neur>();
 
-    public ArrayList<Integer[]> jointMap = new ArrayList<Integer[]>();
+    public ArrayList<Neur> neurs = new ArrayList<Neur>();
+    public ArrayList<NeurJoint> neurJoints = new ArrayList<NeurJoint>();
+
+    public ArrayList<Float> data = new ArrayList<Float>();
 
     public int maxMechID = -1;
 
@@ -26,11 +28,56 @@ public class Robot {
         addRectMech(0.38f, 0.025f, 10, new Vec2(0, y), 0, world); //base
         addCircleMech(0.076f, 0.1f, new Vec2(-0.35f, y), world); //wheel left
         addCircleMech(0.076f, 0.1f, new Vec2(+0.35f, y), world); //wheel right
-        addRectMech(0.025f, 0.38f, 0.1f, new Vec2(0, y+0.38f), 0, world); //arm
+        addRectMech(0.025f, 0.5f, 0.1f, new Vec2(0, y+0.5f), 0, world); //arm
         
-        addMechJointRev(0, 1, new Vec2(-0.35f, y), world);
-        addMechJointRev(0, 2, new Vec2(+0.35f, y), world);
-        addMechJointRev(0, 3, new Vec2(0, y+0.01f), world);
+        addMechJointRev(0, 1, new Vec2(-0.35f, y), world); //0
+        addMechJointRev(0, 2, new Vec2(+0.35f, y), world); //1
+        addMechJointRev(0, 3, new Vec2(0, y+0.01f), world); //2
+        addMechJointRelease(); //3
+
+        for(int i = 0; i < 10; i++){
+            neurs.add(new Neur());
+        }
+
+        //get arm angle and put into neur 2
+        setNeurSensor(2, 2, -6f, -5f);
+
+        //NOT attached
+        setNeurInner(1, 3, -10, 1);
+
+        //boxX > 0
+        setNeurInner(0, 4, 20, -10);
+
+        //(NOT attached) AND (boxX > 0)
+        setNeurInner(3, 5, 10, -7.5f);
+        setNeurInner(4, 5, 10, -7.5f);
+
+        //set wheel powers
+        setNeurOutput(5, 0, -20, 10);
+        setNeurOutput(5, 1, -20, 10);
+
+        //if arm too high
+        setNeurInner(2, 6, -10, +10f);
+
+        //(NOT attached) AND arm too high
+        setNeurInner(3, 7, 10, -7.5f);
+        setNeurInner(6, 7, 10, -7.5f);
+
+
+        //set arm power
+        setNeurOutput(7, 2, -5, 2.5f);
+
+        //arm high enough to launch
+        setNeurInner(2, 8, -5, 2.5f);
+        
+        //attached AND arm too high
+        setNeurInner(1, 9, 10, -7.5f);
+        setNeurInner(8, 9, 10, -7.5f);
+
+        //release
+        setNeurOutput(9, 3, 10, -5);
+
+
     }
 
     public Robot(){}
@@ -68,7 +115,41 @@ public class Robot {
 
     }
 
-    public void update(){
+    public void addMechJointRelease(){
+
+        mechJoints.add(new MechJoint());
+
+    }
+
+
+    public void setNeurSensor(int mechJID, int neurID, float weight, float bias){
+        neurJoints.add(new NeurJoint(mechJoints.get(mechJID), neurs.get(neurID), weight, bias));
+    }
+
+    public void setNeurInner(int neurInputID, int neurOutputID, float weight, float bias){
+        neurJoints.add(new NeurJoint(neurs.get(neurInputID), neurs.get(neurOutputID), weight, bias));
+    }
+
+    public void setNeurOutput(int neurID, int mechJID, float weight, float bias){
+        neurJoints.add(new NeurJoint(neurs.get(neurID), mechJoints.get(mechJID), weight, bias));
+    }
+
+    public void update(float boxX, boolean attached){
+        neurs.get(0).energy = boxX;
+        neurs.get(1).energy = attached ? 999 : -999;
+
+        for(NeurJoint neurJoint : neurJoints){
+            neurJoint.update();
+        }
+
+        for(int i = 0; i<neurs.size(); i++){
+            System.out.println("neur " + i + " : " + neurs.get(i).get());
+        }
+
+        for(Neur neur : neurs){
+            neur.energy = 0;
+        }
+
         
     }
 
@@ -99,6 +180,8 @@ public class Robot {
                 newRobot.addMechJointWeld(oldJoint.mechA.id, oldJoint.mechB.id, newWorld);
             }
         }
+
+
 
         return newRobot;
     }

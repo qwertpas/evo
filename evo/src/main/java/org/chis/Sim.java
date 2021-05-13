@@ -73,6 +73,19 @@ public class Sim extends PApplet{
     public void draw() {
         clear();
 
+        for(Robot robot : robots){
+            robot.update(
+                box.getPosition().x - robot.mechs.get(0).body.getPosition().x,
+                attached
+            );
+            if(!robot.mechJoints.get(3).grab){
+                world.destroyJoint(weldJoint);
+                attached = false;
+            }
+        }
+
+        
+
 
 
         if(!attached && System.currentTimeMillis() - lastAttachTime > 1000){
@@ -95,7 +108,7 @@ public class Sim extends PApplet{
         
 
         PDraw.drawWorld(world, this);
-        world.step(1 / 60.0f, 1, 2);
+        world.step(1 / 45.0f, 6, 8);
 
     }
 
