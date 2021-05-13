@@ -17,15 +17,16 @@ import org.jbox2d.dynamics.joints.WeldJointDef;
 import processing.core.PApplet;
 
 public class Sim extends PApplet{
-    ArrayList<Robot> robots;
+    ArrayList<Robot> robots = new ArrayList<Robot>();
     Body box;
     Body ground;
     World world;
 
     @Override
     public void settings() {
-        init();
         size(Toolkit.getDefaultToolkit().getScreenSize().width, 500);
+
+        init();
     }
 
     public void init(){
@@ -33,7 +34,7 @@ public class Sim extends PApplet{
         { // WORLD
             world = new World(new Vec2(0, -10f));
         }
-        
+
         { // GROUND
             BodyDef groundBodyDef = new BodyDef();
             ground = world.createBody(groundBodyDef);
@@ -53,13 +54,15 @@ public class Sim extends PApplet{
             bd.fixedRotation = false;
             bd.position.set(2, 2);
             box = world.createBody(bd);
-            box.createFixture(boxShape, 0.001f);
-
-            
+            box.createFixture(boxShape, 0.001f); 
         }
-        
-        new Robot(world);
 
+        if(robots.size() > 0){
+            Robot lastRobot = robots.get(robots.size() - 1);
+            robots.add(lastRobot.mutate(world));
+        }else{
+            robots.add(new Robot(world));
+        }
     }
 
     boolean attached = false;
@@ -94,6 +97,15 @@ public class Sim extends PApplet{
         PDraw.drawWorld(world, this);
         world.step(1 / 60.0f, 1, 2);
 
+    }
+
+    @Override
+    public void keyPressed() {
+        if(key == 'm'){
+            System.out.println("mutate");
+
+            init();
+        }
     }
 
     

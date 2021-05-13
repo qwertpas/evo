@@ -1,5 +1,6 @@
 package org.chis.mechs;
 
+import org.chis.Mech;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
