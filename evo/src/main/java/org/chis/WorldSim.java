@@ -3,6 +3,7 @@ package org.chis;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Arrays;
 
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -37,7 +38,7 @@ public class WorldSim {
             ground = world.createBody(groundBodyDef);
 
             EdgeShape groundShape = new EdgeShape();
-            groundShape.set(new Vec2(-40.0f, 0.0f), new Vec2(40.0f, 0.0f));
+            groundShape.set(new Vec2(-200.0f, 0.0f), new Vec2(40.0f, 0.0f));
             ground.createFixture(groundShape, 0.0f);
         }
         
@@ -51,7 +52,7 @@ public class WorldSim {
             bd.fixedRotation = false;
             bd.position.set(2, 2);
             box = world.createBody(bd);
-            box.createFixture(boxShape, 0.001f); 
+            box.createFixture(boxShape, 0.1f); 
         }
     }
 
@@ -65,7 +66,9 @@ public class WorldSim {
         );
 
         if(!robot.mechJoints.get(3).grab){
-            world.destroyJoint(weldJoint);
+            if(weldJoint != null){
+                world.destroyJoint(weldJoint);
+            }
             attached = false;
         }
 
@@ -111,28 +114,10 @@ public class WorldSim {
 
         Robot bestRobot = new Robot(new WorldSim().world);
 
-        { //ZERO
-        WorldSim demoSim0 = new WorldSim();
-        demoSim0.robot = bestRobot.copy(demoSim0.world);
-        Visualizer v0 = new Visualizer(demoSim0, 0);
-        v0.run();
-
-
-        BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
-
-        try {
-            String s = input.readLine();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        v0.noLoop();
-        }
-
-
+        // visualize(bestRobot, -1);
         // System.out.println("\n original genome: " + bestRobot.getGenome());
 
-        for(int g = 0; g < generations; g++){
+        for(int g = 1; g < generations + 1; g++){
 
             float bestScore = 0;
 
@@ -151,30 +136,34 @@ public class WorldSim {
             }
 
             System.out.println("gen: " + g + ", bestScore: " + bestScore);
-            // System.out.println("genome: " + bestRobot.getGenome());
 
-            if(g < 5 || g % 5 == 0){
-                WorldSim demoSim = new WorldSim();
-                demoSim.robot = bestRobot.copy(demoSim.world);
-                Visualizer v = new Visualizer(demoSim, g+1);
-                v.run();
-
-
-                BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
-
-                try {
-                    String s = input.readLine();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                v.noLoop();
-                
+            int[] visible = new int[]{10, 25};
+            final int gen = g;
+            if(Arrays.stream(visible).anyMatch(i -> i == gen)){
+                visualize(bestRobot, g);
             }
 
         }
+        System.exit(0);
 
         
 
+    }
+
+    private static void visualize(Robot robot, int g){
+        WorldSim demoSim = new WorldSim();
+        demoSim.robot = robot.copy(demoSim.world);
+        Visualizer v = new Visualizer(demoSim, g);
+        v.run();
+
+        BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
+
+        try {
+            input.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        v.noLoop();
     }
 }

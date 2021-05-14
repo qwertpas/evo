@@ -213,24 +213,24 @@ public class Robot {
                 newRobot.setNeurSensor(
                     oldJoint.inputMechJ.id, 
                     oldJoint.outputNeur.id, 
-                    oldJoint.weight + rng(0.01),
-                    oldJoint.bias + rng(0.01)
+                    oldJoint.weight + rng(0.1),
+                    oldJoint.bias + rng(0.1)
                 );
             }
             if(oldJoint.type == NeurType.INNER){
                 newRobot.setNeurInner(
                     oldJoint.inputNeur.id, 
                     oldJoint.outputNeur.id, 
-                    oldJoint.weight + rng(0.01),
-                    oldJoint.bias + rng(0.01)
+                    oldJoint.weight + rng(0.1),
+                    oldJoint.bias + rng(0.1)
                 );
             }
             if(oldJoint.type == NeurType.OUTPUT){
                 newRobot.setNeurOutput(
                     oldJoint.inputNeur.id, 
                     oldJoint.outputMechJ.id, 
-                    oldJoint.weight + rng(0.01),
-                    oldJoint.bias + rng(0.01)
+                    oldJoint.weight + rng(0.1),
+                    oldJoint.bias + rng(0.1)
                 );
             }
             
