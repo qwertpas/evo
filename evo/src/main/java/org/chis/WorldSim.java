@@ -1,5 +1,9 @@
 package org.chis;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -100,12 +104,31 @@ public class WorldSim {
     public static void main(String[] args) {
 
         int pop = 50;
-        int generations = 5;
+        int generations = 25;
 
         WorldSim[] worldSims = new WorldSim[pop];
         Robot[] robots = new Robot[pop];
 
         Robot bestRobot = new Robot(new WorldSim().world);
+
+        { //ZERO
+        WorldSim demoSim0 = new WorldSim();
+        demoSim0.robot = bestRobot.copy(demoSim0.world);
+        Visualizer v0 = new Visualizer(demoSim0, 0);
+        v0.run();
+
+
+        BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
+
+        try {
+            String s = input.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        v0.noLoop();
+        }
+
 
         // System.out.println("\n original genome: " + bestRobot.getGenome());
 
@@ -130,11 +153,28 @@ public class WorldSim {
             System.out.println("gen: " + g + ", bestScore: " + bestScore);
             // System.out.println("genome: " + bestRobot.getGenome());
 
+            if(g < 5 || g % 5 == 0){
+                WorldSim demoSim = new WorldSim();
+                demoSim.robot = bestRobot.copy(demoSim.world);
+                Visualizer v = new Visualizer(demoSim, g+1);
+                v.run();
+
+
+                BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
+
+                try {
+                    String s = input.readLine();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                v.noLoop();
+                
+            }
+
         }
 
-        WorldSim demoSim = new WorldSim();
-        demoSim.robot = bestRobot.copy(demoSim.world);
-        new Visualizer(demoSim).run();
+        
 
     }
 }

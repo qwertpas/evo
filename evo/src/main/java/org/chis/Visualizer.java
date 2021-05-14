@@ -9,10 +9,17 @@ public class Visualizer extends PApplet{
 
     WorldSim worldSim;
 
+    PDraw pDraw = new PDraw();
+
     int tick;
 
-    public Visualizer(WorldSim worldSim){
+    int generation;
+
+    boolean running = false;
+
+    public Visualizer(WorldSim worldSim, int g){
         this.worldSim = worldSim;
+        this.generation = g;
     }
 
     public void run(){
@@ -26,29 +33,47 @@ public class Visualizer extends PApplet{
 
     @Override
     public void draw() {
-        if(tick < 650){
-            worldSim.loop();
-            tick++;
-        }else{
-            return;
+
+        if(running){
+            if(tick < 650){
+                worldSim.loop();
+                tick++;
+            }else{
+                return;
+            }
+
+            clear();
+
+    
+            if(worldSim.box.getPosition().x < -4){
+                pDraw.scale = 50;
+                pDraw.offset.x = 1200;
+                
+            }else{
+                pDraw.scale = 150;
+                pDraw.offset.x = width/2;
+                pDraw.offset.y = -height + 50;
+            }
+    
+            pDraw.drawWorld(worldSim.world, this);
+            pDraw.drawText("Generation: " + generation, 50, this);
+            pDraw.drawText("Box moved: " + (-worldSim.box.getPosition().x + 2), 80, this);
+            pDraw.drawText("Time left: " + Math.round((650 - tick)/0.6) / 100.0, 110, this);
         }
-
-        clear();
-
-        if(worldSim.box.getPosition().x < -4){
-            PDraw.scale = 50;
-            PDraw.offset.x = 1200;
-            
-        }else{
-            PDraw.scale = 150;
-            PDraw.offset.x = width/2;
-            PDraw.offset.y = -height + 50;
-        }
-
-        PDraw.drawWorld(worldSim.world, this);
-        PDraw.drawText("Box moved: " + (-worldSim.box.getPosition().x + 2), 50, this);
-        PDraw.drawText("Time left: " + Math.round((650 - tick)/0.6) / 100.0, 80, this);
 
         
+
+        
+    }
+
+    @Override
+    public void exitActual() {
+    }
+
+    @Override
+    public void keyPressed() {
+        if(key == 'p'){
+            running = running ? false : true;
+        }
     }
 }

@@ -12,17 +12,17 @@ import processing.core.PApplet;
 
 public class PDraw {
 
-    public static float scale = 150;
-    public static Vec2 offset = new Vec2(5, 5);
+    public float scale = 150;
+    public Vec2 offset = new Vec2(5, 5);
 
 
-    public static void drawText(String text, float y, PApplet pApplet){
+    public void drawText(String text, float y, PApplet pApplet){
         pApplet.fill(74, 195, 255);
         pApplet.textSize(32);
         pApplet.text(text, 50, y); 
     }
 
-    public static void drawWorld(World world, PApplet pApplet){
+    public void drawWorld(World world, PApplet pApplet){
 
 
 
@@ -41,13 +41,13 @@ public class PDraw {
 
             
             
-            PDraw.drawShape(body, pApplet);
+            drawShape(body, pApplet);
             
             body = body.getNext();
         }
     }
 
-    public static void drawShape(Body body, PApplet pApplet) {
+    public void drawShape(Body body, PApplet pApplet) {
 
         
 
@@ -124,7 +124,7 @@ public class PDraw {
 
     }
 
-    static int colorSig(double density){
+     int colorSig(double density){
         return (int) (255 / (1+Math.exp(-(density-5)/2.0)));
     }
 }
