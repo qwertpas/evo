@@ -76,11 +76,11 @@ public class MechJoint {
                 System.out.println("released");
             }else{
                 grab = true;
-                System.out.println("try grab");
+                // System.out.println("try grab");
             }
             return;
         }
-        System.out.println(mechA.id + " and " + mechB.id + ": " + power);
+        // System.out.println(mechA.id + " and " + mechB.id + ": " + power);
         revJoint.setMotorSpeed(power);
     }
 

@@ -6,6 +6,27 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch WorldSim",
+            "request": "launch",
+            "mainClass": "org.chis.WorldSim",
+            "projectName": "evo"
+        },
+        {
+            "type": "java",
+            "name": "Launch Live",
+            "request": "launch",
+            "mainClass": "org.chis.Live",
+            "projectName": "evo"
+        },
+        {
+            "type": "java",
+            "name": "Launch Life",
+            "request": "launch",
+            "mainClass": "org.chis.Life",
+            "projectName": "evo"
+        },
+        {
+            "type": "java",
             "name": "Launch Sim",
             "request": "launch",
             "mainClass": "org.chis.Sim",

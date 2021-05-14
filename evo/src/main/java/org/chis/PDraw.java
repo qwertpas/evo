@@ -70,7 +70,7 @@ public class PDraw {
 
                 CircleShape circle = (CircleShape) fixture.getShape();
 
-                Vec2 center = body.getPosition();
+                // Vec2 center = body.getPosition();
                 // Transform.mulToOutUnsafe(xf, circle.m_p, center);
                 float radius = circle.m_radius;
                 pApplet.ellipse(0, 0, radius*2 , radius*2);

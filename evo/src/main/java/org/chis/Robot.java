@@ -152,7 +152,7 @@ public class Robot {
         }
 
         for(int i = 0; i<neurs.size(); i++){
-            System.out.println("neur " + i + " : " + neurs.get(i).get());
+            // System.out.println("neur " + i + " : " + neurs.get(i).get());
         }
 
         for(Neur neur : neurs){

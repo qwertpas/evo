@@ -1,8 +1,5 @@
 package org.chis;
 
-import java.awt.Toolkit;
-import java.util.ArrayList;
-
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -14,22 +11,18 @@ import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.WeldJoint;
 import org.jbox2d.dynamics.joints.WeldJointDef;
 
-import processing.core.PApplet;
-
-public class Sim extends PApplet{
-    ArrayList<Robot> robots = new ArrayList<Robot>();
+public class WorldSim {
+    Robot robot;
     Body box;
     Body ground;
     World world;
 
-    @Override
-    public void settings() {
-        size(Toolkit.getDefaultToolkit().getScreenSize().width, 500);
+    boolean attached = false;
+    int lastAttachTick = 0;
+    int tick = 0;
+    WeldJoint weldJoint;
 
-        init();
-    }
-
-    public void init(){
+    public WorldSim(){
 
         { // WORLD
             world = new World(new Vec2(0, -10f));
@@ -57,41 +50,24 @@ public class Sim extends PApplet{
             box.createFixture(boxShape, 0.001f); 
         }
 
-        if(robots.size() > 0){
-            Robot lastRobot = robots.get(robots.size()-1);
-            robots.add(lastRobot.mutate(world));
-        }else{
-            robots.add(new Robot(world));
-        }
+        robot = new Robot(world);
     }
 
-    boolean attached = false;
-    int lastAttachTick = 0;
-    WeldJoint weldJoint;
 
-    int tick = 0;
-
-    @Override
-    public void draw() {
-        clear();
-
-        tick++;
-        System.out.println(tick + " : " + box.getPosition().x);
+    public void loop() {
 
         
+        robot.update(
+            box.getPosition().x - robot.mechs.get(0).body.getPosition().x,
+            attached
+        );
 
-        for(Robot robot : robots){
-            robot.update(
-                box.getPosition().x - robot.mechs.get(0).body.getPosition().x,
-                attached
-            );
-            if(!robot.mechJoints.get(3).grab){
-                world.destroyJoint(weldJoint);
-                attached = false;
-            }
+        if(!robot.mechJoints.get(3).grab){
+            world.destroyJoint(weldJoint);
+            attached = false;
         }
 
-        if(!attached && tick - lastAttachTick > 45){
+        if(!attached && tick - lastAttachTick > 90){
             for (ContactEdge ce = box.getContactList(); ce != null; ce = ce.next){
                 if (ce.other != ground && ce.contact.isTouching()){
                     System.out.println("grab");
@@ -108,38 +84,19 @@ public class Sim extends PApplet{
                 }
             }
         }
-                
-
-        PDraw.drawWorld(world, this);
+        
+        tick++;
         world.step(1 / 45.0f, 6, 8);
 
     }
-
-    @Override
-    public void keyPressed() {
-        if(key == 'm'){
-            System.out.println("mutate");
-
-            init();
-        }
-    }
-
     
 
     public static void main(String[] args) {
-        String[] processingArgs = { "Sim" };
-        Sim sim = new Sim();
+        WorldSim worldSim = new WorldSim();
 
-        PApplet.runSketch(processingArgs, sim);
-
-
-        
-        // mySketch.init();
-        // long lasttime = System.nanoTime();
-        // while(true){
-        //     mySketch.world.step(1 / 60.0f, 1, 2);
-        //     System.out.println((System.nanoTime() - lasttime) * 1e-9);
-        //     lasttime = System.nanoTime();
-        // }
+        for(int t = 0; t < 670; t++){
+            worldSim.loop();
+        }
+        System.out.println(worldSim.box.getPosition().x);
     }
 }
