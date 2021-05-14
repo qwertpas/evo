@@ -73,7 +73,7 @@ public class MechJoint {
         if(type == Type.RELEASE){
             if(power > 0){
                 grab = false;
-                System.out.println("released");
+                // System.out.println("released");
             }else{
                 grab = true;
                 // System.out.println("try grab");

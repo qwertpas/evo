@@ -14,12 +14,17 @@ public class PDraw {
 
     public static float scale = 150;
     public static Vec2 offset = new Vec2(5, 5);
-    // public static color color;
+
+
+    public static void drawText(String text, float y, PApplet pApplet){
+        pApplet.fill(74, 195, 255);
+        pApplet.textSize(32);
+        pApplet.text(text, 50, y); 
+    }
 
     public static void drawWorld(World world, PApplet pApplet){
 
-        offset.x = pApplet.width/2;
-        offset.y = -pApplet.height + 50;
+
 
         Body body = world.getBodyList();
         // System.out.println("Draw World");
@@ -52,6 +57,8 @@ public class PDraw {
         int red = colorSig(fixture.getDensity());
 
         pApplet.fill(red, 255 - red, 255/2);
+
+        
 
 
         pApplet.pushMatrix();

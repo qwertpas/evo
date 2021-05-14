@@ -49,8 +49,6 @@ public class WorldSim {
             box = world.createBody(bd);
             box.createFixture(boxShape, 0.001f); 
         }
-
-        robot = new Robot(world);
     }
 
 
@@ -70,7 +68,7 @@ public class WorldSim {
         if(!attached && tick - lastAttachTick > 90){
             for (ContactEdge ce = box.getContactList(); ce != null; ce = ce.next){
                 if (ce.other != ground && ce.contact.isTouching()){
-                    System.out.println("grab");
+                    // System.out.println("grab");
     
                     WeldJointDef jd = new WeldJointDef();
     
@@ -89,14 +87,54 @@ public class WorldSim {
         world.step(1 / 45.0f, 6, 8);
 
     }
+
+    public float workout(){
+        for(int t = 0; t < 670; t++){
+            loop();
+        }
+        float endPos = box.getPosition().x;
+        return -endPos + 2;
+    }
     
 
     public static void main(String[] args) {
-        WorldSim worldSim = new WorldSim();
 
-        for(int t = 0; t < 670; t++){
-            worldSim.loop();
+        int pop = 50;
+        int generations = 5;
+
+        WorldSim[] worldSims = new WorldSim[pop];
+        Robot[] robots = new Robot[pop];
+
+        Robot bestRobot = new Robot(new WorldSim().world);
+
+        // System.out.println("\n original genome: " + bestRobot.getGenome());
+
+        for(int g = 0; g < generations; g++){
+
+            float bestScore = 0;
+
+            for(int i = 0; i < pop; i++){
+                worldSims[i] = new WorldSim();
+                robots[i] = bestRobot.mutate(worldSims[i].world);
+                worldSims[i].robot = robots[i];
+            }
+
+            for(int i = 0; i < pop; i++){
+                float score = worldSims[i].workout();
+                if(score > bestScore){
+                    bestScore = score;
+                    bestRobot = robots[i];
+                }
+            }
+
+            System.out.println("gen: " + g + ", bestScore: " + bestScore);
+            // System.out.println("genome: " + bestRobot.getGenome());
+
         }
-        System.out.println(worldSim.box.getPosition().x);
+
+        WorldSim demoSim = new WorldSim();
+        demoSim.robot = bestRobot.copy(demoSim.world);
+        new Visualizer(demoSim).run();
+
     }
 }

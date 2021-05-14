@@ -170,9 +170,85 @@ public class Robot {
         for(Mech oldMech : this.mechs){
             if(oldMech.shape == Shape.CIRCLE){
                 newRobot.addCircleMech(
-                    oldMech.radius + rng(0.0), 
+                    oldMech.radius + rng(0.01), 
                     oldMech.density + rng(0), 
-                    oldMech.center.add(new Vec2(rng(0.0), rng(0.0))), 
+                    oldMech.center.add(new Vec2(rng(0.01), rng(0.01))), 
+                    newWorld
+                );
+            }
+            if(oldMech.shape == Shape.RECT){
+                newRobot.addRectMech(
+                    oldMech.width + rng(0.01),
+                    oldMech.height + rng(0.01),
+                    oldMech.density + rng(0.01),
+                    oldMech.center.add(new Vec2(rng(0.01), rng(0.01))), 
+                    oldMech.angle + rng(0.01),
+                    newWorld
+                );
+            }
+        }
+        
+        for(MechJoint oldJoint : this.mechJoints){
+            if(oldJoint.type == Type.REV){
+                newRobot.addMechJointRev(oldJoint.mechA.id, oldJoint.mechB.id, oldJoint.anchor, newWorld);
+            }
+            if(oldJoint.type == Type.WELD){
+                newRobot.addMechJointWeld(oldJoint.mechA.id, oldJoint.mechB.id, newWorld);
+            }
+            if(oldJoint.type == Type.RELEASE){
+                newRobot.addMechJointRelease();
+            }
+        }
+
+
+
+        for(int i = 0; i<this.neurs.size(); i++){
+            Neur neur = new Neur();
+            neur.id = i;
+            newRobot.neurs.add(neur);
+        }
+
+        for(NeurJoint oldJoint : this.neurJoints){
+            if(oldJoint.type == NeurType.SENSOR){
+                newRobot.setNeurSensor(
+                    oldJoint.inputMechJ.id, 
+                    oldJoint.outputNeur.id, 
+                    oldJoint.weight + rng(0.01),
+                    oldJoint.bias + rng(0.01)
+                );
+            }
+            if(oldJoint.type == NeurType.INNER){
+                newRobot.setNeurInner(
+                    oldJoint.inputNeur.id, 
+                    oldJoint.outputNeur.id, 
+                    oldJoint.weight + rng(0.01),
+                    oldJoint.bias + rng(0.01)
+                );
+            }
+            if(oldJoint.type == NeurType.OUTPUT){
+                newRobot.setNeurOutput(
+                    oldJoint.inputNeur.id, 
+                    oldJoint.outputMechJ.id, 
+                    oldJoint.weight + rng(0.01),
+                    oldJoint.bias + rng(0.01)
+                );
+            }
+            
+        }
+
+        return newRobot;
+    }
+
+    public Robot copy(World newWorld){
+
+        Robot newRobot = new Robot();
+
+        for(Mech oldMech : this.mechs){
+            if(oldMech.shape == Shape.CIRCLE){
+                newRobot.addCircleMech(
+                    oldMech.radius, 
+                    oldMech.density, 
+                    oldMech.center, 
                     newWorld
                 );
             }
@@ -194,7 +270,9 @@ public class Robot {
         }
 
         for(int i = 0; i<this.neurs.size(); i++){
-            newRobot.neurs.add(new Neur());
+            Neur neur = new Neur();
+            neur.id = i;
+            newRobot.neurs.add(neur);
         }
 
         for(NeurJoint oldJoint : this.neurJoints){
@@ -207,16 +285,102 @@ public class Robot {
             if(oldJoint.type == NeurType.OUTPUT){
                 newRobot.setNeurOutput(oldJoint.inputNeur.id, oldJoint.outputMechJ.id, oldJoint.weight, oldJoint.bias);
             }
-            
         }
-
-
 
         return newRobot;
     }
 
     public float rng(double scale){
         return (float) (random.nextGaussian() * scale);
+    }
+
+    public String getGenome(){
+        String genome = "";
+
+        genome += "mechs{";
+        for(Mech mech : mechs){
+
+            if(mech.shape == Shape.CIRCLE){
+                genome += "circle{";
+
+                genome += "radius:" + mech.radius + ",";
+                genome += "density:" + mech.density + ",";
+                genome += "centerX:" + mech.center.x + ",";
+                genome += "centerΥ:" + mech.center.y + ",";
+
+                genome += "},";
+            }
+            if(mech.shape == Shape.RECT){
+                genome += "rect{";
+
+                genome += "width:" + mech.width + ",";
+                genome += "height:" + mech.height + ",";
+                genome += "density:" + mech.density + ",";
+                genome += "centerX:" + mech.center.x + ",";
+                genome += "centerY:" + mech.center.y + ",";
+                genome += "angle:" + mech.angle + ",";
+
+                genome += "},";
+            }
+
+        }
+        genome += "},";
+
+        genome += "mechJs{";
+        for(MechJoint mechJoint : this.mechJoints){
+            if(mechJoint.type == Type.REV){
+                genome += "rev{";
+                genome += "idA:" + mechJoint.mechA.id + ",";
+                genome += "idB:" + mechJoint.mechB.id + ",";
+                genome += "anchorX:" + mechJoint.anchor.x + ",";
+                genome += "anchorY:" + mechJoint.anchor.y + ",";
+                genome += "},";
+            }
+            if(mechJoint.type == Type.WELD){
+                genome += "weld{";
+                genome += "idA:" + mechJoint.mechA.id + ",";
+                genome += "idB:" + mechJoint.mechB.id + ",";
+                genome += "},";
+            }
+            if(mechJoint.type == Type.RELEASE){
+                genome += "release{";
+                genome += "},";
+            }
+        }
+        genome += "},";
+
+        genome += "neurs{size:" + neurs.size() + ",},";
+        
+        genome += "neurJs{";
+        for(NeurJoint neurJoint : this.neurJoints){
+            if(neurJoint.type == NeurType.SENSOR){
+                genome += "sensor{";
+                genome += "input:" + neurJoint.inputMechJ.id + ",";
+                genome += "output:" + neurJoint.outputNeur.id + ",";
+                genome += "weight:" + neurJoint.weight + ",";
+                genome += "bias:" + neurJoint.bias + ",";
+                genome += "},";
+            }
+            if(neurJoint.type == NeurType.INNER){
+                genome += "inner{";
+                genome += "input:" + neurJoint.inputNeur.id + ",";
+                genome += "output:" + neurJoint.outputNeur.id + ",";
+                genome += "weight:" + neurJoint.weight + ",";
+                genome += "bias:" + neurJoint.bias + ",";
+                genome += "},";
+            }
+            if(neurJoint.type == NeurType.OUTPUT){
+                genome += "output{";
+                genome += "input:" + neurJoint.inputNeur.id + ",";
+                genome += "output:" + neurJoint.outputMechJ.id + ",";
+                genome += "weight:" + neurJoint.weight + ",";
+                genome += "bias:" + neurJoint.bias + ",";
+                genome += "},";
+            } 
+        }
+        genome += "},";
+
+        return genome;
     }
 
     public void growArm(){
