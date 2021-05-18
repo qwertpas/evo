@@ -24,7 +24,11 @@ public class PDraw {
 
     public void drawWorld(World world, PApplet pApplet){
 
-
+        int top = pApplet.height - 50;
+        for(int i = 0; i < pApplet.width/scale; i=i+2){
+            float left = i*scale + offset.x % (2*scale);
+            pApplet.rect(left, top, scale, 50);
+        }
 
         Body body = world.getBodyList();
         // System.out.println("Draw World");
@@ -38,6 +42,7 @@ public class PDraw {
             pApplet.stroke(255);
 
             pApplet.strokeWeight(0.001f);
+            pApplet.fill(255);
 
             
             
@@ -48,8 +53,6 @@ public class PDraw {
     }
 
     public void drawShape(Body body, PApplet pApplet) {
-
-        
 
 
         Fixture fixture = body.getFixtureList();

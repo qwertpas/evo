@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.Arrays;
+import java.util.Collections;
 
 import org.jbox2d.collision.shapes.EdgeShape;
 import org.jbox2d.collision.shapes.PolygonShape;
@@ -11,6 +12,7 @@ import org.jbox2d.common.Vec2;
 import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.BodyDef;
 import org.jbox2d.dynamics.BodyType;
+import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.contacts.ContactEdge;
 import org.jbox2d.dynamics.joints.WeldJoint;
@@ -38,8 +40,14 @@ public class WorldSim {
             ground = world.createBody(groundBodyDef);
 
             EdgeShape groundShape = new EdgeShape();
-            groundShape.set(new Vec2(-200.0f, 0.0f), new Vec2(40.0f, 0.0f));
-            ground.createFixture(groundShape, 0.0f);
+            groundShape.set(new Vec2(-2000.0f, 0.0f), new Vec2(40.0f, 0.0f));
+
+            FixtureDef fd = new FixtureDef();
+            fd.shape = groundShape;
+            fd.density = 0;
+            fd.friction = 0.9f;
+
+            ground.createFixture(fd);
         }
         
         { // BOX
@@ -72,7 +80,7 @@ public class WorldSim {
             attached = false;
         }
 
-        if(!attached && tick - lastAttachTick > 90){
+        if(!attached && tick - lastAttachTick > 30){
             for (ContactEdge ce = box.getContactList(); ce != null; ce = ce.next){
                 if (ce.other != ground && ce.contact.isTouching()){
                     // System.out.println("grab");
@@ -107,17 +115,20 @@ public class WorldSim {
     public static void main(String[] args) {
 
         int pop = 50;
-        int generations = 25;
+        Integer[] generations = new Integer[]{5, 10, 20};
+        int lastGen = Collections.max(Arrays.asList(generations));
 
         WorldSim[] worldSims = new WorldSim[pop];
         Robot[] robots = new Robot[pop];
 
         Robot bestRobot = new Robot(new WorldSim().world);
 
-        // visualize(bestRobot, -1);
-        // System.out.println("\n original genome: " + bestRobot.getGenome());
+        if(generations[0] == 0){
+            visualize(bestRobot, 0);
+        }
 
-        for(int g = 1; g < generations + 1; g++){
+
+        for(int g = 1; g < lastGen + 1; g++){
 
             float bestScore = 0;
 
@@ -137,16 +148,17 @@ public class WorldSim {
 
             System.out.println("gen: " + g + ", bestScore: " + bestScore);
 
-            int[] visible = new int[]{10, 25};
             final int gen = g;
-            if(Arrays.stream(visible).anyMatch(i -> i == gen)){
+            if(Arrays.stream(generations).anyMatch(i -> i == gen)){
                 visualize(bestRobot, g);
+                if(gen == lastGen){
+                    break;
+                }
             }
 
         }
         System.exit(0);
 
-        
 
     }
 

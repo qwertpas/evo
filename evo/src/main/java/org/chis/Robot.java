@@ -171,17 +171,17 @@ public class Robot {
             if(oldMech.shape == Shape.CIRCLE){
                 newRobot.addCircleMech(
                     oldMech.radius + rng(0.01), 
-                    oldMech.density + rng(0), 
-                    oldMech.center.add(new Vec2(rng(0.01), rng(0.01))), 
+                    oldMech.density + rng(0.01), 
+                    oldMech.center.add(new Vec2(rng(0.0), rng(0.0))), 
                     newWorld
                 );
             }
             if(oldMech.shape == Shape.RECT){
                 newRobot.addRectMech(
-                    oldMech.width + rng(0.01),
+                    oldMech.width + rng(0.1),
                     oldMech.height + rng(0.01),
                     oldMech.density + rng(0.01),
-                    oldMech.center.add(new Vec2(rng(0.01), rng(0.01))), 
+                    oldMech.center.add(new Vec2(rng(0.0), rng(0.0))), 
                     oldMech.angle + rng(0.01),
                     newWorld
                 );
@@ -213,24 +213,24 @@ public class Robot {
                 newRobot.setNeurSensor(
                     oldJoint.inputMechJ.id, 
                     oldJoint.outputNeur.id, 
-                    oldJoint.weight + rng(0.1),
-                    oldJoint.bias + rng(0.1)
+                    oldJoint.weight + rng(1),
+                    oldJoint.bias + rng(1)
                 );
             }
             if(oldJoint.type == NeurType.INNER){
                 newRobot.setNeurInner(
                     oldJoint.inputNeur.id, 
                     oldJoint.outputNeur.id, 
-                    oldJoint.weight + rng(0.1),
-                    oldJoint.bias + rng(0.1)
+                    oldJoint.weight + rng(1),
+                    oldJoint.bias + rng(1)
                 );
             }
             if(oldJoint.type == NeurType.OUTPUT){
                 newRobot.setNeurOutput(
                     oldJoint.inputNeur.id, 
                     oldJoint.outputMechJ.id, 
-                    oldJoint.weight + rng(0.1),
-                    oldJoint.bias + rng(0.1)
+                    oldJoint.weight + rng(1),
+                    oldJoint.bias + rng(1)
                 );
             }
             

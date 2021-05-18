@@ -45,9 +45,10 @@ public class Visualizer extends PApplet{
             clear();
 
     
-            if(worldSim.box.getPosition().x < -4){
-                pDraw.scale = 50;
-                pDraw.offset.x = 1200;
+            if(true){
+                pDraw.scale = 150;
+                pDraw.offset.x = 1200 - worldSim.box.getPosition().x * pDraw.scale;
+                pDraw.offset.y = -height + 50;
                 
             }else{
                 pDraw.scale = 150;
