@@ -1,5 +1,7 @@
 package org.chis;
 
+import java.io.Serializable;
+
 import org.jbox2d.collision.shapes.CircleShape;
 import org.jbox2d.collision.shapes.PolygonShape;
 import org.jbox2d.common.Vec2;
@@ -10,7 +12,9 @@ import org.jbox2d.dynamics.FixtureDef;
 import org.jbox2d.dynamics.World;
 import org.jbox2d.dynamics.joints.Joint;
 
-public class Mech {
+public class Mech implements Serializable{
+
+    private static final long serialVersionUID = 892393725108602894L;
 
     public enum Shape{
         RECT, CIRCLE

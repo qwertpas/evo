@@ -1,6 +1,12 @@
 package org.chis;
 
 import java.awt.Toolkit;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 
 import processing.core.PApplet;
 
@@ -45,16 +51,14 @@ public class Visualizer extends PApplet{
             clear();
 
     
-            if(true){
-                pDraw.scale = 150;
-                pDraw.offset.x = 1200 - worldSim.box.getPosition().x * pDraw.scale;
-                pDraw.offset.y = -height + 50;
+            pDraw.scale = 150;
+            pDraw.offset.x = width/2 - (worldSim.box.getPosition().x - 2) * pDraw.scale;
+            pDraw.offset.y = -height + 50;
                 
-            }else{
-                pDraw.scale = 150;
-                pDraw.offset.x = width/2;
-                pDraw.offset.y = -height + 50;
-            }
+            // pDraw.scale = 150;
+            // pDraw.offset.x = width/2;
+            // pDraw.offset.y = -height + 50;
+            
     
             pDraw.drawWorld(worldSim.world, this);
             pDraw.drawText("Generation: " + generation, 50, this);
@@ -75,6 +79,71 @@ public class Visualizer extends PApplet{
     public void keyPressed() {
         if(key == 'p'){
             running = running ? false : true;
+        }
+    }
+
+    public static void visualize(Robot robot, int g, boolean block){
+        WorldSim demoSim = new WorldSim();
+        demoSim.robot = robot.copy(demoSim.world);
+
+
+        Visualizer v = new Visualizer(demoSim, g);
+        v.run();
+
+        BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
+
+        if(block){
+            try {
+                input.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        
+
+        v.noLoop();
+    }
+
+    public static void main(String[] args) {
+        while(true){
+            BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
+
+            String arg = "-1";
+            
+            System.out.println("Which robot to show?");
+            try {
+                arg = input.readLine();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            File file;
+            int gen;
+            if(Character.isDigit(arg.charAt(0))){
+                gen = Integer.parseInt(arg);
+                file = new File("evo/saves", gen + ".robot");
+                System.out.println("Showing gen " + gen + " from temp save");
+            }
+            else{
+                String galleryName = arg.substring(0, arg.indexOf(" "));
+                gen = Integer.parseInt(arg.substring(arg.indexOf(" ") + 1));
+                file = new File("evo/gallery/" + galleryName, gen + ".robot");
+                System.out.println("Showing gen " + gen + " from gallery " + galleryName);
+
+            }
+            
+
+
+            try {
+                FileInputStream fis = new FileInputStream(file);
+                ObjectInputStream ois = new ObjectInputStream(fis);
+                Robot result = (Robot) ois.readObject();
+                ois.close();
+
+                visualize(result, gen, true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 }

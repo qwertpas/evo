@@ -1,5 +1,6 @@
 package org.chis;
 
+import java.io.Serializable;
 import java.util.function.DoubleSupplier;
 
 import org.jbox2d.common.Vec2;
@@ -9,13 +10,13 @@ import org.jbox2d.dynamics.joints.RevoluteJointDef;
 import org.jbox2d.dynamics.joints.WeldJoint;
 import org.jbox2d.dynamics.joints.WeldJointDef;
 
-public class MechJoint {
+public class MechJoint implements Serializable{
     public enum Type{
         REV, WELD, RELEASE
     }
     
-    public RevoluteJoint revJoint;
-    public DoubleSupplier angle;
+    public transient RevoluteJoint revJoint;
+    public transient DoubleSupplier angle;
 
     public WeldJoint weldJoint;
 

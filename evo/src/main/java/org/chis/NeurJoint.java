@@ -1,6 +1,8 @@
 package org.chis;
 
-public class NeurJoint {
+import java.io.Serializable;
+
+public class NeurJoint implements Serializable{
 
     public enum NeurType{
         SENSOR, INNER, OUTPUT

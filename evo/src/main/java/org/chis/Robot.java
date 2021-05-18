@@ -1,5 +1,6 @@
 package org.chis;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -7,10 +8,12 @@ import org.chis.Mech.Shape;
 import org.chis.MechJoint.Type;
 import org.chis.NeurJoint.NeurType;
 import org.jbox2d.common.Vec2;
-import org.jbox2d.dynamics.Body;
 import org.jbox2d.dynamics.World;
 
-public class Robot {
+public class Robot implements Serializable {
+
+    private static final long serialVersionUID = -8797262847415221738L;
+
     public ArrayList<Mech> mechs = new ArrayList<Mech>();
     public ArrayList<MechJoint> mechJoints = new ArrayList<MechJoint>();
 
@@ -181,7 +184,7 @@ public class Robot {
                     oldMech.width + rng(0.1),
                     oldMech.height + rng(0.01),
                     oldMech.density + rng(0.01),
-                    oldMech.center.add(new Vec2(rng(0.0), rng(0.0))), 
+                    oldMech.center.add(new Vec2(rng(0.01), rng(0.01))), 
                     oldMech.angle + rng(0.01),
                     newWorld
                 );
@@ -218,12 +221,30 @@ public class Robot {
                 );
             }
             if(oldJoint.type == NeurType.INNER){
-                newRobot.setNeurInner(
-                    oldJoint.inputNeur.id, 
-                    oldJoint.outputNeur.id, 
-                    oldJoint.weight + rng(1),
-                    oldJoint.bias + rng(1)
-                );
+                if(false){
+                    System.out.println("new connection");
+
+                    newRobot.setNeurInner(
+                        oldJoint.inputNeur.id, 
+                        oldJoint.outputNeur.id, 
+                        oldJoint.weight + rng(1),
+                        oldJoint.bias + rng(1)
+                    );
+
+                    newRobot.setNeurInner(
+                        oldJoint.inputNeur.id, 
+                        oldJoint.outputNeur.id, 
+                        oldJoint.weight + rng(1),
+                        oldJoint.bias + rng(1)
+                    );
+                }else{
+                    newRobot.setNeurInner(
+                        oldJoint.inputNeur.id, 
+                        oldJoint.outputNeur.id, 
+                        oldJoint.weight + rng(1),
+                        oldJoint.bias + rng(1)
+                    );
+                }
             }
             if(oldJoint.type == NeurType.OUTPUT){
                 newRobot.setNeurOutput(
@@ -383,6 +404,7 @@ public class Robot {
         return genome;
     }
 
+
     public void growArm(){
         // Vector2D out = new Vector2D(anchor.sub(parent.getPosition()));
         // Vec2 outHeight = new Vector2D(anchor).add(new Vector2D(height, out.getAngle(), Type.POLAR)).toVec2();
@@ -393,15 +415,6 @@ public class Robot {
         // bd.angle = (float) out.rotate90().getAngle();
     }
 
-    public static void main(String[] args) {
-        World world = new World(new Vec2(0, 0)); 
-        new Robot(world);
-
-        for (Body body = world.getBodyList(); body != null; body = body.getNext()){
-            System.out.println(body.getPosition());
-        }
-        
-    }
 
 
 }

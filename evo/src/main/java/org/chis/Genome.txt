@@ -1,3 +1,5 @@
+This is the base genome:
+
 mechs{
     rect{
         width: 0.0,

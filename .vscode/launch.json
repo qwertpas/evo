@@ -6,6 +6,12 @@
     "configurations": [
         {
             "type": "java",
+            "name": "Launch Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
             "name": "Launch WorldSim",
             "request": "launch",
             "mainClass": "org.chis.WorldSim",
@@ -13,50 +19,9 @@
         },
         {
             "type": "java",
-            "name": "Launch Live",
+            "name": "Launch Visualizer",
             "request": "launch",
-            "mainClass": "org.chis.Live",
-            "projectName": "evo"
-        },
-        {
-            "type": "java",
-            "name": "Launch Life",
-            "request": "launch",
-            "mainClass": "org.chis.Life",
-            "projectName": "evo"
-        },
-        {
-            "type": "java",
-            "name": "Launch Sim",
-            "request": "launch",
-            "mainClass": "org.chis.Sim",
-            "projectName": "evo"
-        },
-        {
-            "type": "java",
-            "name": "Launch Robot",
-            "request": "launch",
-            "mainClass": "org.chis.Robot",
-            "projectName": "evo"
-        },
-        {
-            "type": "java",
-            "name": "Launch Current File",
-            "request": "launch",
-            "mainClass": "${file}"
-        },
-        {
-            "type": "java",
-            "name": "Launch App",
-            "request": "launch",
-            "mainClass": "org.chis.App",
-            "projectName": "evo"
-        },
-        {
-            "type": "java",
-            "name": "Launch MySketch",
-            "request": "launch",
-            "mainClass": "org.chis.MySketch",
+            "mainClass": "org.chis.Visualizer",
             "projectName": "evo"
         },
         {
@@ -66,12 +31,6 @@
             "mainClass": "org.chis.RunTestbed",
             "projectName": "evo"
         },
-        {
-            "type": "java",
-            "name": "Launch Seesaw",
-            "request": "launch",
-            "mainClass": "org.chis.Seesaw",
-            "projectName": "evo"
-        }
+
     ]
 }

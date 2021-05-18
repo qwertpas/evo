@@ -1,8 +1,8 @@
 package org.chis;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -99,12 +99,12 @@ public class WorldSim {
         }
         
         tick++;
-        world.step(1 / 45.0f, 6, 8);
+        world.step(1 / 60.0f, 6, 8);
 
     }
 
     public float workout(){
-        for(int t = 0; t < 670; t++){
+        for(int t = 0; t < 650; t++){
             loop();
         }
         float endPos = box.getPosition().x;
@@ -115,7 +115,7 @@ public class WorldSim {
     public static void main(String[] args) {
 
         int pop = 50;
-        Integer[] generations = new Integer[]{5, 10, 20};
+        Integer[] generations = new Integer[]{20};
         int lastGen = Collections.max(Arrays.asList(generations));
 
         WorldSim[] worldSims = new WorldSim[pop];
@@ -124,7 +124,7 @@ public class WorldSim {
         Robot bestRobot = new Robot(new WorldSim().world);
 
         if(generations[0] == 0){
-            visualize(bestRobot, 0);
+            Visualizer.visualize(bestRobot, 0, true);
         }
 
 
@@ -146,11 +146,12 @@ public class WorldSim {
                 }
             }
 
+            saveRobot(bestRobot, g);
             System.out.println("gen: " + g + ", bestScore: " + bestScore);
 
             final int gen = g;
             if(Arrays.stream(generations).anyMatch(i -> i == gen)){
-                visualize(bestRobot, g);
+                Visualizer.visualize(bestRobot, g, true);
                 if(gen == lastGen){
                     break;
                 }
@@ -162,20 +163,18 @@ public class WorldSim {
 
     }
 
-    private static void visualize(Robot robot, int g){
-        WorldSim demoSim = new WorldSim();
-        demoSim.robot = robot.copy(demoSim.world);
-        Visualizer v = new Visualizer(demoSim, g);
-        v.run();
+    
 
-        BufferedReader input = new BufferedReader (new InputStreamReader (System.in));
-
+    private static void saveRobot(Robot robot, int g){
         try {
-            input.readLine();
-        } catch (IOException e) {
+            File file = new File("evo/saves", g+".robot");
+            FileOutputStream fos = new FileOutputStream(file);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(robot);
+            oos.close();
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        v.noLoop();
+        
     }
 }

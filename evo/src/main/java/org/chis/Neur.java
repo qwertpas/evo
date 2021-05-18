@@ -1,6 +1,8 @@
 package org.chis;
 
-public class Neur {
+import java.io.Serializable;
+
+public class Neur implements Serializable{
 
     public float energy = 0.0f;
 
