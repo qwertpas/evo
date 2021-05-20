@@ -23,7 +23,7 @@ public class Mech implements Serializable{
 
     public Neur inputNeur;
 
-    public Body body;
+    public transient Body body;
     public Joint joint;
 
     public int id;

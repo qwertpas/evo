@@ -13,6 +13,7 @@ import org.jbox2d.dynamics.World;
 public class Robot implements Serializable {
 
     private static final long serialVersionUID = -8797262847415221738L;
+    public static final float uselessNeurThreshold = 0.005f;
 
     public ArrayList<Mech> mechs = new ArrayList<Mech>();
     public ArrayList<MechJoint> mechJoints = new ArrayList<MechJoint>();
@@ -182,10 +183,10 @@ public class Robot implements Serializable {
             if(oldMech.shape == Shape.RECT){
                 newRobot.addRectMech(
                     oldMech.width + rng(0.1),
-                    oldMech.height + rng(0.01),
+                    oldMech.height + rng(0.1),
                     oldMech.density + rng(0.01),
                     oldMech.center.add(new Vec2(rng(0.01), rng(0.01))), 
-                    oldMech.angle + rng(0.01),
+                    oldMech.angle + rng(0.1),
                     newWorld
                 );
             }
@@ -221,21 +222,24 @@ public class Robot implements Serializable {
                 );
             }
             if(oldJoint.type == NeurType.INNER){
-                if(false){
-                    System.out.println("new connection");
+                if(rng(1) < -2){
+                    Neur neur = new Neur();
+                    int newID = neurs.size();
+                    neur.id = newID;
+                    newRobot.neurs.add(neur);
 
                     newRobot.setNeurInner(
                         oldJoint.inputNeur.id, 
-                        oldJoint.outputNeur.id, 
+                        newID,
                         oldJoint.weight + rng(1),
                         oldJoint.bias + rng(1)
                     );
 
                     newRobot.setNeurInner(
-                        oldJoint.inputNeur.id, 
+                        newID, 
                         oldJoint.outputNeur.id, 
-                        oldJoint.weight + rng(1),
-                        oldJoint.bias + rng(1)
+                        1,
+                        0
                     );
                 }else{
                     newRobot.setNeurInner(
@@ -255,6 +259,24 @@ public class Robot implements Serializable {
                 );
             }
             
+        }
+
+        
+        for(int i = 0; i < newRobot.neurJoints.size(); i++){
+            NeurJoint nj = newRobot.neurJoints.get(i);
+            if(Math.abs(nj.weight) < uselessNeurThreshold && Math.abs(nj.bias) < uselessNeurThreshold){
+                newRobot.neurs.remove(i);
+                System.out.println("removed: " + i);
+            }
+        }
+
+        for(Neur neur : newRobot.neurs){
+            if(rng(1) > 2.5){
+                int otherNeurID = random.nextInt(newRobot.neurs.size());
+                if(otherNeurID == neur.id) break;
+
+                newRobot.setNeurInner(neur.id, otherNeurID, rng(1), rng(1));
+            }
         }
 
         return newRobot;

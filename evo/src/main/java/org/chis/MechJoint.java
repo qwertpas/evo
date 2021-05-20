@@ -44,7 +44,7 @@ public class MechJoint implements Serializable{
 
         revJointDef.initialize(mechA.body, mechB.body, anchor);
         revJointDef.motorSpeed = 0.0f;
-        revJointDef.maxMotorTorque = 5.0f;
+        revJointDef.maxMotorTorque = 1.0f;
         revJointDef.enableMotor = true;
 
         revJoint = ((RevoluteJoint) world.createJoint(revJointDef));
@@ -70,9 +70,9 @@ public class MechJoint implements Serializable{
         grab = true;
     }
 
-    public void setPower(float power){
+    public void setPower(float speed){
         if(type == Type.RELEASE){
-            if(power > 0){
+            if(speed > 0){
                 grab = false;
                 // System.out.println("released");
             }else{
@@ -81,8 +81,21 @@ public class MechJoint implements Serializable{
             }
             return;
         }
+
+        speed = limit(speed, 10);
         // System.out.println(mechA.id + " and " + mechB.id + ": " + power);
-        revJoint.setMotorSpeed(power);
+        revJoint.setMotorSpeed(speed);
+        // revJoint.setMaxMotorTorque(limit(5 / speed, 5));
+    }
+
+    public float limit(float val, float limit){
+        if(val > limit){
+            return limit;
+        }else if(val < -limit){
+            return -limit;
+        }else{
+            return val;
+        }
     }
 
 }

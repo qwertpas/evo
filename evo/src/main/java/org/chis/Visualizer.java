@@ -140,7 +140,10 @@ public class Visualizer extends PApplet{
                 Robot result = (Robot) ois.readObject();
                 ois.close();
 
+                System.out.println("\n Genome: " + result.getGenome() + "\n");
+
                 visualize(result, gen, true);
+
             } catch (Exception e) {
                 e.printStackTrace();
             }

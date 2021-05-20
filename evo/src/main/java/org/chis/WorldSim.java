@@ -45,7 +45,7 @@ public class WorldSim {
             FixtureDef fd = new FixtureDef();
             fd.shape = groundShape;
             fd.density = 0;
-            fd.friction = 0.9f;
+            fd.friction = 1f;
 
             ground.createFixture(fd);
         }
@@ -60,7 +60,32 @@ public class WorldSim {
             bd.fixedRotation = false;
             bd.position.set(2, 2);
             box = world.createBody(bd);
-            box.createFixture(boxShape, 0.1f); 
+
+            FixtureDef fd = new FixtureDef();
+            fd.shape = boxShape;
+            fd.density = 0.1f;
+            fd.friction = 1f;
+
+            box.createFixture(fd); 
+        }
+
+        { // obstacle
+
+            PolygonShape boxShape = new PolygonShape();
+            boxShape.setAsBox(0.5f, 0.5f);
+
+            BodyDef bd = new BodyDef();
+            bd.type = BodyType.DYNAMIC;
+            bd.fixedRotation = false;
+            bd.position.set(3.5f, 2);
+            Body obstacle = world.createBody(bd);
+
+            FixtureDef fd = new FixtureDef();
+            fd.shape = boxShape;
+            fd.density = 100f;
+            fd.friction = 0.1f;
+
+            obstacle.createFixture(fd); 
         }
     }
 
@@ -108,14 +133,14 @@ public class WorldSim {
             loop();
         }
         float endPos = box.getPosition().x;
-        return -endPos + 2;
+        return -(-endPos + 2);
     }
     
 
     public static void main(String[] args) {
 
         int pop = 50;
-        Integer[] generations = new Integer[]{20};
+        Integer[] generations = new Integer[]{40};
         int lastGen = Collections.max(Arrays.asList(generations));
 
         WorldSim[] worldSims = new WorldSim[pop];
@@ -147,7 +172,7 @@ public class WorldSim {
             }
 
             saveRobot(bestRobot, g);
-            System.out.println("gen: " + g + ", bestScore: " + bestScore);
+            System.out.println("g: " + g + ", n: " + bestRobot.neurs.size() +  ", nj: " + bestRobot.neurJoints.size() + ", bestScore: " + bestScore);
 
             final int gen = g;
             if(Arrays.stream(generations).anyMatch(i -> i == gen)){
