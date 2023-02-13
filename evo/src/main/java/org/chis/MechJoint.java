@@ -14,6 +14,8 @@ public class MechJoint implements Serializable{
     public enum Type{
         REV, WELD, RELEASE
     }
+
+    private static final long serialVersionUID = 1503664786564030777L;
     
     public transient RevoluteJoint revJoint;
     public transient DoubleSupplier angle;
